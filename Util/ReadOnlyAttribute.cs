@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace MornBeat
+namespace MornLib
 {
     internal sealed class ReadOnlyAttribute : PropertyAttribute
     {

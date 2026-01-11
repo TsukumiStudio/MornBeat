@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace MornBeat
+namespace MornLib
 {
     public class MornBeatScoreReader
     {

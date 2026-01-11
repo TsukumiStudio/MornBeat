@@ -1,11 +1,10 @@
-using MornGlobal;
 using UnityEngine;
 
-namespace MornBeat
+namespace MornLib
 {
     internal sealed class MornBeatGlobal : MornGlobalPureBase<MornBeatGlobal>
     {
-        protected override string ModuleName => nameof(MornBeat);
+        protected override string ModuleName => "MornBeat";
 
         internal static void Log(string message)
         {

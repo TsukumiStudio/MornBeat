@@ -1,6 +1,6 @@
 using System.Threading;
 
-namespace MornBeat
+namespace MornLib
 {
     public struct MornBeatStartInfo
     {

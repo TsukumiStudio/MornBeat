@@ -1,7 +1,6 @@
-#if USE_VCONTAINER
 using UnityEngine;
 
-namespace MornBeat
+namespace MornLib
 {
     [CreateAssetMenu(fileName = nameof(MornBeatScaleSettings), menuName = "MornBeat/" + nameof(MornBeatScaleSettings))]
     public sealed class MornBeatScaleSettings : ScriptableObject
@@ -14,4 +13,3 @@ namespace MornBeat
         public int PerBeat => _perBeat;
     }
 }
-#endif

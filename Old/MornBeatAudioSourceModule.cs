@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace MornBeat
+namespace MornLib
 {
     [Serializable]
     internal class MornBeatAudioSourceModule

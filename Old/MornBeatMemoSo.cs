@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
-namespace MornBeat
+namespace MornLib
 {
     [CreateAssetMenu(fileName = nameof(MornBeatMemoSo), menuName = "MornBeat/" + nameof(MornBeatMemoSo))]
     public sealed class MornBeatMemoSo : ScriptableObject

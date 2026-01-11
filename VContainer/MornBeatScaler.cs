@@ -1,9 +1,8 @@
-#if USE_VCONTAINER
 using UniRx;
 using UnityEngine;
 using VContainer;
 
-namespace MornBeat
+namespace MornLib
 {
     public sealed class MornBeatScaler : MonoBehaviour
     {
@@ -24,4 +23,3 @@ namespace MornBeat
         }
     }
 }
-#endif

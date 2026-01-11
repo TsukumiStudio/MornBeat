@@ -6,7 +6,7 @@ using UniRx;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace MornBeat
+namespace MornLib
 {
     public sealed class MornBeatControllerMono : MonoBehaviour
     {

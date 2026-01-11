@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace MornBeat
+namespace MornLib
 {
     public sealed class MornBeatPlayer : MonoBehaviour
     {

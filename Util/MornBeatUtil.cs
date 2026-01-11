@@ -2,7 +2,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-namespace MornBeat
+namespace MornLib
 {
     public static class MornBeatUtil
     {

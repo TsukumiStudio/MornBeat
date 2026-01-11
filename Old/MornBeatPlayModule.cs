@@ -2,7 +2,7 @@ using System;
 using UniRx;
 using UnityEngine;
 
-namespace MornBeat
+namespace MornLib
 {
     [Serializable]
     public class MornBeatPlayModule

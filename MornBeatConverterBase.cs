@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
-namespace MornBeat
+namespace MornLib
 {
     public abstract class MornBeatConverterBase : ScriptableObject
     {

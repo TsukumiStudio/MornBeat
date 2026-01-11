@@ -1,4 +1,4 @@
-﻿namespace MornBeat
+﻿namespace MornLib
 {
     /// <summary> フェーズのBpm遷移 </summary>
     internal enum MornBeatPhaseBpmTransitionType

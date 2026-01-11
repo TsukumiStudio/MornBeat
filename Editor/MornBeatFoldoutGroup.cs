@@ -2,7 +2,7 @@
 using System;
 using UnityEditor;
 
-namespace MornBeat
+namespace MornLib
 {
     internal sealed class MornBeatFoldoutGroup
     {

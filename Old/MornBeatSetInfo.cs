@@ -1,4 +1,4 @@
-namespace MornBeat
+namespace MornLib
 {
     public readonly struct MornBeatSetInfo
     {
