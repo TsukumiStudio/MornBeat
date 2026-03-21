@@ -29,18 +29,18 @@ namespace MornLib
 
             if (clip.preloadAudioData || clip.loadState == AudioDataLoadState.Loaded)
             {
-                MornBeatGlobal.Log($"ロード済み！: {clip.name}");
+                MornBeatGlobal.Logger.Log($"ロード済み！: {clip.name}");
                 return;
             }
 
-            MornBeatGlobal.Log($"ロード開始...: {clip.name}");
+            MornBeatGlobal.Logger.Log($"ロード開始...: {clip.name}");
             clip.LoadAudioData();
             while (clip.loadState != AudioDataLoadState.Loaded)
             {
                 await UniTask.Yield(cancellationToken: ct);
             }
 
-            MornBeatGlobal.Log($"ロード完了！: {clip.name}");
+            MornBeatGlobal.Logger.Log($"ロード完了！: {clip.name}");
         }
 
         public async static UniTask UnloadAsync(this AudioClip clip, CancellationToken ct = default)
@@ -52,18 +52,18 @@ namespace MornLib
 
             if (clip.preloadAudioData || clip.loadState == AudioDataLoadState.Unloaded)
             {
-                MornBeatGlobal.Log($"アンロード不要！: {clip.name}");
+                MornBeatGlobal.Logger.Log($"アンロード不要！: {clip.name}");
                 return;
             }
 
-            MornBeatGlobal.Log($"アンロード開始...: {clip.name}");
+            MornBeatGlobal.Logger.Log($"アンロード開始...: {clip.name}");
             clip.UnloadAudioData();
             while (clip.loadState != AudioDataLoadState.Unloaded)
             {
                 await UniTask.Yield(cancellationToken: ct);
             }
 
-            MornBeatGlobal.Log($"アンロード完了！: {clip.name}");
+            MornBeatGlobal.Logger.Log($"アンロード完了！: {clip.name}");
         }
 
         public static bool BitHas(this int self, int flag)
