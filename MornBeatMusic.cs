@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace MornLib
 {
-    [CreateAssetMenu(menuName = "MornLib/" + nameof(MornBeatMusic))]
+    [CreateAssetMenu(menuName = "Morn/Beat/" + nameof(MornBeatMusic))]
     public sealed class MornBeatMusic : ScriptableObject
     {
         [SerializeField] internal AudioClip MusicClip;

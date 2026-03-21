@@ -6,7 +6,7 @@ using UnityEngine.Assertions;
 
 namespace MornLib
 {
-    [CreateAssetMenu(fileName = nameof(MornBeatMemoSo), menuName = "MornBeat/" + nameof(MornBeatMemoSo))]
+    [CreateAssetMenu(fileName = nameof(MornBeatMemoSo), menuName = "Morn/Beat/" + nameof(MornBeatMemoSo))]
     public sealed class MornBeatMemoSo : ScriptableObject
     {
         [SerializeField] private bool _isLoop;
