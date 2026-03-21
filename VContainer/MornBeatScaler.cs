@@ -9,22 +9,39 @@ namespace MornLib
         [Inject] private MornBeatController _beatController;
         [SerializeField, HelpBox("未設定時はMornBeatGlobalのデフォルトを使用")]
         private MornBeatScaleSettings _settings;
+        [SerializeField] private bool _isAutoStart = true;
         private Vector3 _originScale;
         private Vector3 _adjustedAimScale;
+        private bool _isActive;
+
+        public bool IsActive
+        {
+            get => _isActive;
+            set
+            {
+                _isActive = value;
+                if (!_isActive)
+                {
+                    transform.localScale = _originScale;
+                }
+            }
+        }
 
         private void Start()
         {
             if (_settings == null) _settings = MornBeatGlobal.I.DefaultScaleSettings;
             _originScale = transform.localScale;
             _adjustedAimScale = CalcAdjustedAimScale();
+            _isActive = _isAutoStart;
             _beatController.PlayModule.OnBeat
-                .Where(x => x.IsJustForAnyBeat(_settings.PerBeat))
+                .Where(x => _isActive && x.IsJustForAnyBeat(_settings.PerBeat))
                 .Subscribe(_ => transform.localScale = _adjustedAimScale)
                 .AddTo(this);
         }
 
         private void Update()
         {
+            if (!_isActive) return;
             var scale = Vector3.Lerp(transform.localScale, _originScale, Time.deltaTime * _settings.LerpSpeed);
             transform.localScale = scale;
         }
