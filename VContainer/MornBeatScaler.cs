@@ -12,6 +12,7 @@ namespace MornLib
 
         private void Start()
         {
+            if (_settings == null) _settings = MornBeatGlobal.I.DefaultScaleSettings;
             _originScale = transform.localScale;
             _beatController.PlayModule.OnBeat.Where(x => x.IsJustForAnyBeat(_settings.PerBeat)).Subscribe(_ => transform.localScale = _settings.AimScale).AddTo(this);
         }

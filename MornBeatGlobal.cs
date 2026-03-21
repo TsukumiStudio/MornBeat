@@ -6,6 +6,8 @@ namespace MornLib
     {
         protected override string ModuleName => "MornBeat";
 
+        [SerializeField] internal MornBeatScaleSettings DefaultScaleSettings;
+
         internal static void Log(string message)
         {
             I.LogInternal(message);
