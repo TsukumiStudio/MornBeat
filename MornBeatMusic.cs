@@ -27,12 +27,6 @@ namespace MornLib
         [SerializeField] private double _interval = 0.000001d;
         [SerializeField] private List<BpmAndTimeInfo> _bpmAndTimeInfoList;
 
-        // --- Measure (サンプルベース) ---
-        [Header("Measure")]
-        [SerializeField] internal List<MornBeatMeasure> MeasureList;
-        [SerializeField] internal List<MornBeatPhase> BpmList;
-        [SerializeField] internal List<double> TimeList;
-
         // --- Properties ---
         public bool IsLoop => _isLoop;
         public int MeasureTickCount => _measureTickCount;
@@ -142,25 +136,8 @@ namespace MornLib
             return (float)maxBpm;
         }
 
-        /// <summary>対象のサンプル数を返します</summary>
-        /// <param name="measure">何小節目か (1始まり)</param>
-        /// <param name="beat">基準となる拍の何番目か (1始まり)</param>
-        /// <param name="beatBase">基準となる拍が何拍子か</param>
-        public long GetSample(int measure, int beat, int beatBase)
-        {
-            var idx = measure - 1;
-            if (idx < 0 || idx >= MeasureList.Count) return 0;
-            var current = MeasureList[idx];
-            if (beat <= 1) return current.StartSamples;
-            var nextSamples = idx + 1 < MeasureList.Count
-                ? MeasureList[idx + 1].StartSamples
-                : (long)_loopClip.samples;
-            var span = nextSamples - current.StartSamples;
-            return current.StartSamples + span * (beat - 1) / beatBase;
-        }
-
         [Serializable]
-        private struct BpmAndTimeInfo
+        internal struct BpmAndTimeInfo
         {
             public double Bpm;
             public double Time;
@@ -172,171 +149,48 @@ namespace MornLib
     internal sealed class MornBeatMusicEditor : Editor
     {
         private MornBeatMusic _music;
-        private SerializedProperty _measureListSerializedProperty;
-        private SerializedProperty _bpmListSerializedProperty;
-        private SerializedProperty _timeListSerializedProperty;
-        private MornBeatFoldoutGroup _generateFromBpm;
-        private MornBeatFoldoutGroup _generateFromTimeStamp;
 
         private void OnEnable()
         {
             _music = (MornBeatMusic)target;
-            _measureListSerializedProperty = serializedObject.FindProperty(nameof(MornBeatMusic.MeasureList));
-            _bpmListSerializedProperty = serializedObject.FindProperty(nameof(MornBeatMusic.BpmList));
-            _timeListSerializedProperty = serializedObject.FindProperty(nameof(MornBeatMusic.TimeList));
-            _generateFromBpm = new MornBeatFoldoutGroup(DrawGenerateFromBpm, "Generate From Bpm");
-            _generateFromTimeStamp = new MornBeatFoldoutGroup(DrawGenerateFromTimeStamp, "Generate From TimeStamp");
         }
-
-        private static readonly HashSet<string> _excludeProperties = new()
-        {
-            nameof(MornBeatMusic.MeasureList),
-            nameof(MornBeatMusic.BpmList),
-            nameof(MornBeatMusic.TimeList),
-        };
 
         public override void OnInspectorGUI()
         {
-            serializedObject.Update();
-
-            // MeasureList/BpmList/TimeList以外を描画
-            var iterator = serializedObject.GetIterator();
-            iterator.NextVisible(true); // m_Script
-            while (iterator.NextVisible(false))
-            {
-                if (_excludeProperties.Contains(iterator.name)) continue;
-                EditorGUILayout.PropertyField(iterator, true);
-            }
-
+            DrawDefaultInspector();
             GUILayout.Space(10);
-
-            // MakeBeat (タイミングリスト生成)
-            if (GUILayout.Button("MakeBeat (タイミングリスト生成)"))
+            if (GUILayout.Button("MakeBeat", GUILayout.Height(30)))
             {
                 _music.MakeBeat();
             }
-
-            GUILayout.Space(10);
-
-            // Measure関連 (読み取り専用)
-            GUI.enabled = false;
-            EditorGUILayout.PropertyField(_measureListSerializedProperty);
-            GUI.enabled = true;
-
-            GUILayout.Space(30);
-            _generateFromBpm.OnGUI();
-            _generateFromTimeStamp.OnGUI();
-            serializedObject.ApplyModifiedProperties();
         }
+    }
 
-        private void DrawGenerateFromBpm()
+    [CustomPropertyDrawer(typeof(MornBeatMusic.BpmAndTimeInfo))]
+    internal sealed class BpmAndTimeInfoDrawer : PropertyDrawer
+    {
+        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            EditorGUI.indentLevel++;
-            EditorGUILayout.PropertyField(_bpmListSerializedProperty);
-            if (GUILayout.Button("Generate", GUILayout.Height(30)))
-            {
-                var isSuccess = true;
-                MornBeatGlobal.Log("Generate Start");
-                var result = new List<MornBeatMeasure>();
-                result.Add(new MornBeatMeasure(1, 0));
-                var frequency = _music.Clip.frequency;
-                var virtualTime = 0d;
-                const double deltaBeat = 0.000001d;
-                foreach (var phase in _music.BpmList)
-                {
-                    if (phase.Transition.StartBpm == 0)
-                    {
-                        isSuccess = false;
-                        MornBeatGlobal.LogError("StartBpm is 0");
-                        break;
-                    }
-
-                    if (phase.Transition.EndBpm == 0)
-                    {
-                        isSuccess = false;
-                        MornBeatGlobal.LogError("EndBpm is 0");
-                        break;
-                    }
-
-                    if (phase.Length.Beat == 0)
-                    {
-                        isSuccess = false;
-                        MornBeatGlobal.LogError("BeatCount is 0");
-                        break;
-                    }
-
-                    if (phase.Length.NoteType == 0)
-                    {
-                        isSuccess = false;
-                        MornBeatGlobal.LogError("BeatType is 0");
-                        break;
-                    }
-
-                    if (phase.Length.Measure == 0)
-                    {
-                        isSuccess = false;
-                        MornBeatGlobal.LogError("MeasureCount is 0");
-                        break;
-                    }
-
-                    var startBpm = phase.Transition.StartBpm;
-                    var endBpm = phase.Transition.EndBpm;
-                    var difBpm = endBpm - startBpm;
-                    var phaseBeat = 0d;
-                    var phaseMeasureBeat = 4d * phase.Length.Beat / phase.Length.NoteType;
-                    var phaseTotalBeat = phaseMeasureBeat * phase.Length.Measure;
-                    var nextPhaseBeat = phaseMeasureBeat;
-                    for (var i = 0; i < phase.Length.Measure; i++)
-                    {
-                        while (phaseBeat < nextPhaseBeat)
-                        {
-                            var currentBpm = startBpm + difBpm * (phaseBeat / phaseTotalBeat);
-                            virtualTime += 60d / currentBpm * deltaBeat;
-                            phaseBeat += deltaBeat;
-                        }
-
-                        result.Add(new MornBeatMeasure(result.Count + 1, (long)(virtualTime * frequency)));
-                        nextPhaseBeat += phaseMeasureBeat;
-                    }
-                }
-
-                _music.MeasureList.Clear();
-                _music.MeasureList.AddRange(result);
-                if (isSuccess)
-                {
-                    MornBeatGlobal.Log("Generate Success");
-                }
-                else
-                {
-                    MornBeatGlobal.LogError("Generate Failed. Please check the log.");
-                }
-            }
-
-            EditorGUI.indentLevel--;
-        }
-
-        private void DrawGenerateFromTimeStamp()
-        {
-            EditorGUI.indentLevel++;
-            EditorGUILayout.PropertyField(_timeListSerializedProperty);
-            if (GUILayout.Button("Generate", GUILayout.Height(30)))
-            {
-                MornBeatGlobal.Log("Generate Start");
-                var result = new List<MornBeatMeasure>();
-                result.Add(new MornBeatMeasure(1, 0));
-                var frequency = _music.Clip.frequency;
-                for (var i = 0; i < _music.TimeList.Count; i++)
-                {
-                    var time = _music.TimeList[i];
-                    result.Add(new MornBeatMeasure(2 + i, (long)(time * frequency)));
-                }
-
-                _music.MeasureList.Clear();
-                _music.MeasureList.AddRange(result);
-                MornBeatGlobal.Log("Generate End");
-            }
-
-            EditorGUI.indentLevel--;
+            EditorGUI.BeginProperty(position, label, property);
+            var labelRect = new Rect(position.x, position.y, EditorGUIUtility.labelWidth, position.height);
+            EditorGUI.LabelField(labelRect, label);
+            var fieldX = position.x + EditorGUIUtility.labelWidth + 2;
+            var fieldW = (position.width - EditorGUIUtility.labelWidth - 2 - 20) / 2;
+            var bpmSp = property.FindPropertyRelative(nameof(MornBeatMusic.BpmAndTimeInfo.Bpm));
+            var timeSp = property.FindPropertyRelative(nameof(MornBeatMusic.BpmAndTimeInfo.Time));
+            var bpmLabelW = 30f;
+            var timeLabelW = 30f;
+            var gap = 4f;
+            EditorGUI.LabelField(new Rect(fieldX, position.y, bpmLabelW, position.height), "Bpm");
+            EditorGUI.PropertyField(
+                new Rect(fieldX + bpmLabelW, position.y, fieldW - bpmLabelW, position.height),
+                bpmSp, GUIContent.none);
+            EditorGUI.LabelField(
+                new Rect(fieldX + fieldW + gap, position.y, timeLabelW, position.height), "Time");
+            EditorGUI.PropertyField(
+                new Rect(fieldX + fieldW + gap + timeLabelW, position.y, fieldW - timeLabelW, position.height),
+                timeSp, GUIContent.none);
+            EditorGUI.EndProperty();
         }
     }
 #endif
