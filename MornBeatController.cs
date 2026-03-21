@@ -8,7 +8,7 @@ using UnityEngine.Assertions;
 
 namespace MornLib
 {
-    public sealed class MornBeatControllerMono : MonoBehaviour
+    public sealed class MornBeatController : MonoBehaviour
     {
         [SerializeField] private MornBeatAudioSourceModule _audioSourceModule;
         [SerializeField] private MornBeatPlayModule _playModule;
@@ -46,10 +46,10 @@ namespace MornLib
 
         public async UniTask StartAsync(MornBeatStartInfo startInfo)
         {
-            Assert.IsNotNull(startInfo.BeatMemo);
-            var beatMemo = startInfo.BeatMemo;
+            Assert.IsNotNull(startInfo.Music);
+            var music = startInfo.Music;
             var isForceInitialize = startInfo.IsForceInitialize ?? false;
-            if (_playModule.BeatMemo == beatMemo && isForceInitialize == false)
+            if (_playModule.Music == music && isForceInitialize == false)
             {
                 return;
             }
@@ -61,7 +61,7 @@ namespace MornLib
             IsPaused = false;
             var prev = _audioSourceModule.GetCurrent();
             var next = _audioSourceModule.GetOther(true);
-            await next.LoadAsync(beatMemo.IntroClip, beatMemo.Clip, beatMemo.IsLoop, ct);
+            await next.LoadAsync(music.IntroClip, music.Clip, music.IsLoop, ct);
             if (startDspTime < AudioSettings.dspTime)
             {
                 var cached = startDspTime;
@@ -69,7 +69,7 @@ namespace MornLib
                 MornBeatGlobal.LogError($"再生時刻が過去のため補正します。[{cached} -> {startDspTime}]");
             }
 
-            _playModule.SetBeatMemo(new MornBeatSetInfo(beatMemo, startDspTime));
+            _playModule.SetMusic(new MornBeatSetInfo(music, startDspTime));
             var taskList = new List<UniTask>
             {
                 prev.UnloadWithFadeOutAsync(next, fadeDuration, ct),

@@ -2,12 +2,12 @@ namespace MornLib
 {
     public readonly struct MornBeatSetInfo
     {
-        public readonly MornBeatMemoSo BeatMemo;
+        public readonly MornBeatMusic Music;
         public readonly double StartDspTime;
 
-        public MornBeatSetInfo(MornBeatMemoSo beatMemo, double startDspTime)
+        public MornBeatSetInfo(MornBeatMusic beatMemo, double startDspTime)
         {
-            BeatMemo = beatMemo;
+            Music = beatMemo;
             StartDspTime = startDspTime;
         }
     }

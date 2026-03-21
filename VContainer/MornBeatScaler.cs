@@ -6,7 +6,7 @@ namespace MornLib
 {
     public sealed class MornBeatScaler : MonoBehaviour
     {
-        [Inject] private MornBeatControllerMono _beatController;
+        [Inject] private MornBeatController _beatController;
         [SerializeField] private MornBeatScaleSettings _settings;
         private Vector3 _originScale;
 
