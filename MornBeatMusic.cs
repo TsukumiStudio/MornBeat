@@ -188,10 +188,26 @@ namespace MornLib
             _generateFromTimeStamp = new MornBeatFoldoutGroup(DrawGenerateFromTimeStamp, "Generate From TimeStamp");
         }
 
+        private static readonly HashSet<string> _excludeProperties = new()
+        {
+            nameof(MornBeatMusic.MeasureList),
+            nameof(MornBeatMusic.BpmList),
+            nameof(MornBeatMusic.TimeList),
+        };
+
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
-            DrawDefaultInspector();
+
+            // MeasureList/BpmList/TimeList以外を描画
+            var iterator = serializedObject.GetIterator();
+            iterator.NextVisible(true); // m_Script
+            while (iterator.NextVisible(false))
+            {
+                if (_excludeProperties.Contains(iterator.name)) continue;
+                EditorGUILayout.PropertyField(iterator, true);
+            }
+
             GUILayout.Space(10);
 
             // MakeBeat (タイミングリスト生成)
@@ -202,7 +218,7 @@ namespace MornLib
 
             GUILayout.Space(10);
 
-            // Measure関連
+            // Measure関連 (読み取り専用)
             GUI.enabled = false;
             EditorGUILayout.PropertyField(_measureListSerializedProperty);
             GUI.enabled = true;
