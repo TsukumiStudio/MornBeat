@@ -6,9 +6,6 @@ namespace MornLib
     {
         protected override string ModuleName => "MornBeat";
 
-        private static MornGlobalLogger _logger;
-        internal static MornGlobalLogger Logger => _logger ??= new MornGlobalLogger(I);
-
         [SerializeField] internal MornBeatScaleSettings DefaultScaleSettings;
 
         internal static void SetDirty(Object obj)

@@ -61,7 +61,7 @@ namespace MornLib
 
             if (startDspTime < AudioSettings.dspTime)
             {
-                MornBeatGlobal.Logger.LogError($"再生時刻が過去です。startDspTime: {startDspTime}, dspTime: {AudioSettings.dspTime}");
+                MornBeatGlobal.I.Logger.LogError($"再生時刻が過去です。startDspTime: {startDspTime}, dspTime: {AudioSettings.dspTime}");
             }
 
             if (_audioSourceIntro.clip != null)
