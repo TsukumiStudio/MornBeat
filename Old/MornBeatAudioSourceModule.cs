@@ -20,10 +20,18 @@ namespace MornLib
 
         private MornBeatIntroLoopAudioSource CreateChild(GameObject owner, string label)
         {
-            var child = new GameObject($"MornBeat_{label}");
+            var intro = CreateAudioSource(owner, $"MornBeat_{label}_Intro");
+            var loop = CreateAudioSource(owner, $"MornBeat_{label}_Loop");
+            return new MornBeatIntroLoopAudioSource(intro, loop);
+        }
+
+        private AudioSource CreateAudioSource(GameObject owner, string name)
+        {
+            var child = new GameObject(name);
             child.transform.SetParent(owner.transform);
-            var source = child.AddComponent<MornBeatIntroLoopAudioSource>();
-            source.Initialize(_mixerGroup);
+            var source = child.AddComponent<AudioSource>();
+            source.playOnAwake = false;
+            source.outputAudioMixerGroup = _mixerGroup;
             return source;
         }
 

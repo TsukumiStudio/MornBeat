@@ -3,30 +3,19 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.Audio;
 
 namespace MornLib
 {
-    internal sealed class MornBeatIntroLoopAudioSource : MonoBehaviour
+    internal sealed class MornBeatIntroLoopAudioSource
     {
-        private AudioSource _audioSourceIntro;
-        private AudioSource _audioSourceLoop;
+        private readonly AudioSource _audioSourceIntro;
+        private readonly AudioSource _audioSourceLoop;
         private CancellationTokenSource _cts;
 
-        internal void Initialize(AudioMixerGroup mixerGroup)
+        internal MornBeatIntroLoopAudioSource(AudioSource introSource, AudioSource loopSource)
         {
-            _audioSourceIntro = CreateAudioSource("Intro", mixerGroup);
-            _audioSourceLoop = CreateAudioSource("Loop", mixerGroup);
-        }
-
-        private AudioSource CreateAudioSource(string label, AudioMixerGroup mixerGroup)
-        {
-            var child = new GameObject($"AudioSource_{label}");
-            child.transform.SetParent(transform);
-            var source = child.AddComponent<AudioSource>();
-            source.playOnAwake = false;
-            source.outputAudioMixerGroup = mixerGroup;
-            return source;
+            _audioSourceIntro = introSource;
+            _audioSourceLoop = loopSource;
         }
 
         private bool Contain(AudioClip clip)
