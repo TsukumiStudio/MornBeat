@@ -3,14 +3,31 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.Audio;
 
 namespace MornLib
 {
     internal sealed class MornBeatIntroLoopAudioSource : MonoBehaviour
     {
-        [SerializeField] private AudioSource _audioSourceIntro;
-        [SerializeField] private AudioSource _audioSourceLoop;
+        private AudioSource _audioSourceIntro;
+        private AudioSource _audioSourceLoop;
         private CancellationTokenSource _cts;
+
+        internal void Initialize(AudioMixerGroup mixerGroup)
+        {
+            _audioSourceIntro = CreateAudioSource("Intro", mixerGroup);
+            _audioSourceLoop = CreateAudioSource("Loop", mixerGroup);
+        }
+
+        private AudioSource CreateAudioSource(string label, AudioMixerGroup mixerGroup)
+        {
+            var child = new GameObject($"AudioSource_{label}");
+            child.transform.SetParent(transform);
+            var source = child.AddComponent<AudioSource>();
+            source.playOnAwake = false;
+            source.outputAudioMixerGroup = mixerGroup;
+            return source;
+        }
 
         private bool Contain(AudioClip clip)
         {
@@ -18,12 +35,12 @@ namespace MornLib
             {
                 return false;
             }
-            
+
             if (_audioSourceIntro.clip == clip)
             {
                 return true;
             }
-            
+
             if (_audioSourceLoop.clip == clip)
             {
                 return true;
@@ -31,7 +48,7 @@ namespace MornLib
 
             return false;
         }
-        
+
         /// <summary> null可 </summary>
         public async UniTask LoadAsync(AudioClip introClip, AudioClip loopClip, bool needLoop = true, CancellationToken ct = default)
         {
@@ -57,7 +74,7 @@ namespace MornLib
             {
                 MornBeatGlobal.LogError($"再生時刻が過去です。startDspTime: {startDspTime}, dspTime: {AudioSettings.dspTime}");
             }
-            
+
             if (_audioSourceIntro.clip != null)
             {
                 // イントロ込みで再生
@@ -161,7 +178,7 @@ namespace MornLib
             {
                 _audioSourceIntro.Pause();
             }
-            
+
             if (_audioSourceLoop.isPlaying)
             {
                 _audioSourceLoop.Pause();

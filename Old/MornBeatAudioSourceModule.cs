@@ -1,14 +1,31 @@
 using System;
 using UnityEngine;
+using UnityEngine.Audio;
 
 namespace MornLib
 {
     [Serializable]
     internal class MornBeatAudioSourceModule
     {
-        [SerializeField] [ReadOnly] private bool _isUsingAudioSourceA;
-        [SerializeField] private MornBeatIntroLoopAudioSource _audioSourceA;
-        [SerializeField] private MornBeatIntroLoopAudioSource _audioSourceB;
+        [SerializeField] private AudioMixerGroup _mixerGroup;
+        [ReadOnly] [SerializeField] private bool _isUsingAudioSourceA;
+        private MornBeatIntroLoopAudioSource _audioSourceA;
+        private MornBeatIntroLoopAudioSource _audioSourceB;
+
+        public void Initialize(GameObject owner)
+        {
+            _audioSourceA = CreateChild(owner, "A");
+            _audioSourceB = CreateChild(owner, "B");
+        }
+
+        private MornBeatIntroLoopAudioSource CreateChild(GameObject owner, string label)
+        {
+            var child = new GameObject($"MornBeat_{label}");
+            child.transform.SetParent(owner.transform);
+            var source = child.AddComponent<MornBeatIntroLoopAudioSource>();
+            source.Initialize(_mixerGroup);
+            return source;
+        }
 
         public MornBeatIntroLoopAudioSource GetCurrent(bool changeSource = false)
         {

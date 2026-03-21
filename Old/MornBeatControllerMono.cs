@@ -26,6 +26,11 @@ namespace MornLib
         public bool IsPaused { get; private set; }
         private const double DefaultStartDspTimeOffset = 0.5d;
 
+        private void Awake()
+        {
+            _audioSourceModule.Initialize(gameObject);
+        }
+
         private void Update()
         {
             if (IsPaused)
