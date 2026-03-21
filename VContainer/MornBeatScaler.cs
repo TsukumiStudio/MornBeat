@@ -7,7 +7,8 @@ namespace MornLib
     public sealed class MornBeatScaler : MonoBehaviour
     {
         [Inject] private MornBeatController _beatController;
-        [SerializeField] private MornBeatScaleSettings _settings;
+        [SerializeField, HelpBox("未設定時はMornBeatGlobalのデフォルトを使用")]
+        private MornBeatScaleSettings _settings;
         private Vector3 _originScale;
 
         private void Start()
