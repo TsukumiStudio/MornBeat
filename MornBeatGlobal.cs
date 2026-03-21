@@ -2,15 +2,11 @@ using UnityEngine;
 
 namespace MornLib
 {
-    internal sealed class MornBeatGlobal : MornGlobalPureBase<MornBeatGlobal>
+    [CreateAssetMenu(menuName = "Morn/Beat/" + nameof(MornBeatGlobal))]
+    internal sealed class MornBeatGlobal : MornGlobalBase<MornBeatGlobal>
     {
         protected override string ModuleName => "MornBeat";
 
         [SerializeField] internal MornBeatScaleSettings DefaultScaleSettings;
-
-        internal static void SetDirty(Object obj)
-        {
-            I.SetDirtyInternal(obj);
-        }
     }
 }

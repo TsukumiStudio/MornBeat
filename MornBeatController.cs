@@ -66,7 +66,7 @@ namespace MornLib
             {
                 var cached = startDspTime;
                 startDspTime = AudioSettings.dspTime + DefaultStartDspTimeOffset;
-                MornBeatGlobal.I.Logger.LogError($"再生時刻が過去のため補正します。[{cached} -> {startDspTime}]");
+                MornBeatGlobal.Logger.LogError($"再生時刻が過去のため補正します。[{cached} -> {startDspTime}]");
             }
 
             _playModule.SetMusic(new MornBeatSetInfo(music, startDspTime));
@@ -92,7 +92,7 @@ namespace MornLib
         {
             if (IsPaused)
             {
-                MornBeatGlobal.I.Logger.LogWarning("既にポーズ中です");
+                MornBeatGlobal.Logger.LogWarning("既にポーズ中です");
                 return;
             }
 
@@ -123,7 +123,7 @@ namespace MornLib
         {
             if (!IsPaused)
             {
-                MornBeatGlobal.I.Logger.LogWarning("ポーズ中ではありません");
+                MornBeatGlobal.Logger.LogWarning("ポーズ中ではありません");
                 return;
             }
 
