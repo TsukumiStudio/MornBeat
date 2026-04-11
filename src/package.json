@@ -1,0 +1,23 @@
+{
+  "name": "com.tsukumistudio.mornbeat",
+  "version": "1.0.0",
+  "displayName": "MornBeat",
+  "description": "Unity 向けリズムエンジン。楽譜・BPM変化対応・拍タイミング計算・intro+loop再生・ポーズ復帰など、リズムゲームに必要な音楽同期機能を提供する。",
+  "unity": "6000.0",
+  "license": "Unlicense",
+  "author": {
+    "name": "TsukumiStudio"
+  },
+  "keywords": [
+    "rhythm",
+    "beat",
+    "music",
+    "timing",
+    "audio"
+  ],
+  "dependencies": {
+    "com.tsukumistudio.mornglobal": "1.0.0",
+    "com.tsukumistudio.mornutil": "1.0.0",
+    "com.tsukumistudio.morneditor": "1.0.0"
+  }
+}
