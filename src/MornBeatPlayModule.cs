@@ -7,9 +7,9 @@ namespace MornLib
     [Serializable]
     public class MornBeatPlayModule
     {
-        [SerializeField] [ReadOnly] private MornBeatMusic _music;
-        [SerializeField] [ReadOnly] private MornBeatTimingSolver _offsetTiming;
-        [SerializeField] [ReadOnly] private MornBeatTimingSolver _pureTiming;
+        private MornBeatMusic _music;
+        private readonly MornBeatTimingSolver _offsetTiming = new();
+        private readonly MornBeatTimingSolver _pureTiming = new();
         private readonly Subject<MornBeatSetInfo> _initializeBeatSubject = new();
         public MornBeatMusic Music => _music;
         public float SpeedScale => _offsetTiming.SpeedScale;

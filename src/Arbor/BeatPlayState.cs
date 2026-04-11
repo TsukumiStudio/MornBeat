@@ -14,7 +14,7 @@ namespace MornLib
 
         public override async void OnStateBegin()
         {
-            var ct = _executeIsolated ? MornApp.QuitToken : CancellationTokenOnEnd;
+            var ct = _executeIsolated ? Application.exitCancellationToken : CancellationTokenOnEnd;
             await _beatController.StartAsync(new MornBeatStartInfo { Music = _music, Ct = ct, });
             Transition(_onComplete);
         }

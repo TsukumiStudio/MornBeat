@@ -4,18 +4,17 @@ using UnityEngine;
 
 namespace MornLib
 {
-    [Serializable]
     public class MornBeatTimingSolver
     {
-        [SerializeField] [ReadOnly] private MornBeatMusic _music;
-        [SerializeField] [ReadOnly] private double _currentBpm = 120;
-        [SerializeField] [ReadOnly] private int _tick;
-        [SerializeField] [ReadOnly] private bool _waitLoop;
-        [SerializeField] [ReadOnly] private double _loopStartDspTime;
-        [SerializeField] [ReadOnly] private double _startDspTime;
-        [SerializeField] [ReadOnly] private double _offsetTime;
-        [SerializeField] [ReadOnly] private double _pausingTime;
-        [SerializeField] [ReadOnly] private double _pauseOffset;
+        private MornBeatMusic _music;
+        private double _currentBpm = 120;
+        private int _tick;
+        private bool _waitLoop;
+        private double _loopStartDspTime;
+        private double _startDspTime;
+        private double _offsetTime;
+        private double _pausingTime;
+        private double _pauseOffset;
         private readonly Subject<MornBeatTimingInfo> _beatSubject = new();
         private readonly Subject<Unit> _loopSubject = new();
         private readonly Subject<Unit> _endBeatSubject = new();

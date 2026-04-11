@@ -8,7 +8,7 @@ namespace MornLib
     internal class MornBeatAudioSourceModule
     {
         [SerializeField] private AudioMixerGroup _mixerGroup;
-        [ReadOnly] [SerializeField] private bool _isUsingAudioSourceA;
+        private bool _isUsingAudioSourceA;
         private MornBeatIntroLoopAudioSource _audioSourceA;
         private MornBeatIntroLoopAudioSource _audioSourceB;
 

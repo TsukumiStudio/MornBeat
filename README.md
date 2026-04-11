@@ -17,7 +17,7 @@ Unity 向けリズムエンジン。楽譜・BPM変化対応・拍タイミン�
 Unity Package Manager で以下の Git URL を追加:
 
 ```
-https://github.com/TsukumiStudio/MornBeat.git?path=src#1.0.0
+https://github.com/TsukumiStudio/MornBeat.git?path=src#1.0.1
 ```
 
 `Window > Package Manager > + > Add package from git URL...` に貼り付けてください。
@@ -29,8 +29,6 @@ https://github.com/TsukumiStudio/MornBeat.git?path=src#1.0.0
 - [VContainer](https://github.com/hadashiA/VContainer) (`jp.hadashikick.vcontainer`)
 - [Arbor](https://arbor.caitsithware.com/) (Arbor 連携用、任意)
 - [MornGlobal](https://github.com/TsukumiStudio/MornGlobal) (`com.tsukumistudio.mornglobal`)
-- [MornUtil](https://github.com/TsukumiStudio/MornUtil) (`com.tsukumistudio.mornutil`)
-- [MornEditor](https://github.com/TsukumiStudio/MornEditor) (`com.tsukumistudio.morneditor`)
 
 ## ライセンス
 
