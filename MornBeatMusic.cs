@@ -12,7 +12,7 @@ namespace MornLib
         // --- Audio ---
         [Header("Audio")]
         [SerializeField] private AudioClip _introClip;
-        [SerializeField] private AudioClip _loopClip;
+        [SerializeField] private AudioClip _clip;
         [SerializeField] private bool _isLoop;
         [SerializeField] [Range(0, 1f)] private float _volume = 1f;
         [SerializeField] private float _offset;
@@ -36,9 +36,9 @@ namespace MornLib
         public int LoopTickSum => TotalTickSum - _introTickSum;
         public int TotalTickSum => _timingList.Count;
         public AudioClip IntroClip => _introClip;
-        public AudioClip Clip => _loopClip;
+        public AudioClip Clip => _clip;
         public float IntroLength => _introClip == null ? 0 : _introClip.length;
-        public float LoopLength => _loopClip == null ? 0 : _loopClip.length + _loopAdditionalTime;
+        public float LoopLength => _clip == null ? 0 : _clip.length + _loopAdditionalTime;
         public float TotalLength => IntroLength + LoopLength;
         public float Volume => _volume;
         internal float Offset => _offset;
@@ -56,7 +56,7 @@ namespace MornLib
 
         internal void MakeBeat()
         {
-            Assert.IsNotNull(_loopClip);
+            Assert.IsNotNull(_clip);
             var beat = 0d;
             var time = 0d;
             _introTickSum = 0;
