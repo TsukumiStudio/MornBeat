@@ -1,36 +1,37 @@
 # MornBeat
 
+<p align="center">
+  <img src="src/Editor/MornBeat.png" alt="MornBeat" width="640" />
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/github/license/TsukumiStudio/MornBeat" alt="License" />
+</p>
+
 ## 概要
 
-音楽のBPM/拍位置から動作を制御するリズムゲーム用ライブラリ。
+Unity 向けリズムエンジン。楽譜・BPM変化対応・拍タイミング計算・intro+loop再生・ポーズ復帰など、リズムゲームに必要な音楽同期機能を提供する。
 
-## 依存関係
+## 導入方法
 
-| 種別 | 名前 |
-|------|------|
-| 外部パッケージ | VContainer |
-| Mornライブラリ | MornLib |
+Unity Package Manager で以下の Git URL を追加:
 
-## 使い方
-
-### 楽曲情報の定義
-
-`MornBeatMusic` ScriptableObjectで楽曲情報を定義します。
-
-```csharp
-// BPMリスト、小節情報を設定
-// エディタ拡張でBPMデータの生成をサポート
+```
+https://github.com/TsukumiStudio/MornBeat.git?path=src#1.0.0
 ```
 
-### 再生管理
+`Window > Package Manager > + > Add package from git URL...` に貼り付けてください。
 
-```csharp
-// MornBeatPlayerで再生管理
-var player = GetComponent<MornBeatPlayer>();
+### 依存パッケージ
 
-// BPMから自動生成するか、タイムスタンプから小節位置を計算
-```
+- [UniRx](https://github.com/neuecc/UniRx) (`com.neuecc.unirx`)
+- [UniTask](https://github.com/Cysharp/UniTask) (`com.cysharp.unitask`)
+- [VContainer](https://github.com/hadashiA/VContainer) (`jp.hadashikick.vcontainer`)
+- [Arbor](https://arbor.caitsithware.com/) (Arbor 連携用、任意)
+- [MornGlobal](https://github.com/TsukumiStudio/MornGlobal) (`com.tsukumistudio.mornglobal`)
+- [MornUtil](https://github.com/TsukumiStudio/MornUtil) (`com.tsukumistudio.mornutil`)
+- [MornEditor](https://github.com/TsukumiStudio/MornEditor) (`com.tsukumistudio.morneditor`)
 
-### BPM変化の定義
+## ライセンス
 
-`MornBeatPhase` でBPM変化を定義します。
+[The Unlicense](LICENSE)
