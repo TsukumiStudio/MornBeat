@@ -1,36 +1,12 @@
-using MornLib;
 using UnityEngine;
 
-namespace MornBeat
+namespace MornLib
 {
-    internal sealed class MornBeatGlobal : MornGlobalPureBase<MornBeatGlobal>
+    [CreateAssetMenu(menuName = "Morn/Beat/" + nameof(MornBeatGlobal))]
+    internal sealed class MornBeatGlobal : MornGlobalBase<MornBeatGlobal>
     {
-        protected override string ModuleName => nameof(MornBeat);
+        protected override string ModuleName => "MornBeat";
 
-        internal static void Log(string message)
-        {
-            Logger.Log(message);
-        }
-
-        internal static void LogWarning(string message)
-        {
-            Logger.LogWarning(message);
-        }
-
-        internal static void LogError(string message)
-        {
-            Logger.LogError(message);
-        }
-
-        internal static void SetDirty(Object obj)
-        {
-            MornGlobalUtil.SetDirty(obj);
-        }
-
-        internal static void LogAndSetDirty(string message, Object obj)
-        {
-            Log(message);
-            SetDirty(obj);
-        }
+        [SerializeField] internal MornBeatScaleSettings DefaultScaleSettings;
     }
 }

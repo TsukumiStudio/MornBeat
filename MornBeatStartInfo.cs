@@ -1,10 +1,10 @@
 using System.Threading;
 
-namespace MornBeat
+namespace MornLib
 {
     public struct MornBeatStartInfo
     {
-        public MornBeatMemoSo BeatMemo;
+        public MornBeatMusic Music;
         public double? StartDspTime;
         public float? FadeDuration;
         public bool? IsForceInitialize;

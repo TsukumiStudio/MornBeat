@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace MornBeat
+namespace MornLib
 {
     [CustomPropertyDrawer(typeof(ReadOnlyAttribute))]
     internal class ReadOnlyDrawer : PropertyDrawer

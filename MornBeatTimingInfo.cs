@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MornBeat
+namespace MornLib
 {
     /// <summary>1小節内における拍の構造体</summary>
     public readonly struct MornBeatTimingInfo

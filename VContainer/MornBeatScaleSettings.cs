@@ -1,9 +1,8 @@
-#if USE_VCONTAINER
 using UnityEngine;
 
-namespace MornBeat
+namespace MornLib
 {
-    [CreateAssetMenu(fileName = nameof(MornBeatScaleSettings), menuName = "MornBeat/" + nameof(MornBeatScaleSettings))]
+    [CreateAssetMenu(fileName = nameof(MornBeatScaleSettings), menuName = "Morn/Beat/" + nameof(MornBeatScaleSettings))]
     public sealed class MornBeatScaleSettings : ScriptableObject
     {
         [SerializeField] private Vector3 _aimScale = Vector3.one * 1.2f;
@@ -14,4 +13,3 @@ namespace MornBeat
         public int PerBeat => _perBeat;
     }
 }
-#endif

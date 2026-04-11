@@ -6,9 +6,9 @@ using UniRx;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace MornBeat
+namespace MornLib
 {
-    public sealed class MornBeatControllerMono : MonoBehaviour
+    public sealed class MornBeatController : MonoBehaviour
     {
         [SerializeField] private MornBeatAudioSourceModule _audioSourceModule;
         [SerializeField] private MornBeatPlayModule _playModule;
@@ -26,6 +26,11 @@ namespace MornBeat
         public bool IsPaused { get; private set; }
         private const double DefaultStartDspTimeOffset = 0.5d;
 
+        private void Awake()
+        {
+            _audioSourceModule.Initialize(gameObject);
+        }
+
         private void Update()
         {
             if (IsPaused)
@@ -41,10 +46,10 @@ namespace MornBeat
 
         public async UniTask StartAsync(MornBeatStartInfo startInfo)
         {
-            Assert.IsNotNull(startInfo.BeatMemo);
-            var beatMemo = startInfo.BeatMemo;
+            Assert.IsNotNull(startInfo.Music);
+            var music = startInfo.Music;
             var isForceInitialize = startInfo.IsForceInitialize ?? false;
-            if (_playModule.BeatMemo == beatMemo && isForceInitialize == false)
+            if (_playModule.Music == music && isForceInitialize == false)
             {
                 return;
             }
@@ -56,15 +61,15 @@ namespace MornBeat
             IsPaused = false;
             var prev = _audioSourceModule.GetCurrent();
             var next = _audioSourceModule.GetOther(true);
-            await next.LoadAsync(beatMemo.IntroClip, beatMemo.Clip, beatMemo.IsLoop, ct);
+            await next.LoadAsync(music.IntroClip, music.Clip, music.IsLoop, ct);
             if (startDspTime < AudioSettings.dspTime)
             {
                 var cached = startDspTime;
                 startDspTime = AudioSettings.dspTime + DefaultStartDspTimeOffset;
-                MornBeatGlobal.LogError($"再生時刻が過去のため補正します。[{cached} -> {startDspTime}]");
+                MornBeatGlobal.Logger.LogError($"再生時刻が過去のため補正します。[{cached} -> {startDspTime}]");
             }
 
-            _playModule.SetBeatMemo(new MornBeatSetInfo(beatMemo, startDspTime));
+            _playModule.SetMusic(new MornBeatSetInfo(music, startDspTime));
             var taskList = new List<UniTask>
             {
                 prev.UnloadWithFadeOutAsync(next, fadeDuration, ct),
@@ -87,7 +92,7 @@ namespace MornBeat
         {
             if (IsPaused)
             {
-                MornBeatGlobal.LogWarning("既にポーズ中です");
+                MornBeatGlobal.Logger.LogWarning("既にポーズ中です");
                 return;
             }
 
@@ -118,7 +123,7 @@ namespace MornBeat
         {
             if (!IsPaused)
             {
-                MornBeatGlobal.LogWarning("ポーズ中ではありません");
+                MornBeatGlobal.Logger.LogWarning("ポーズ中ではありません");
                 return;
             }
 

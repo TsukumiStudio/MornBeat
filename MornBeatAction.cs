@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace MornBeat
+namespace MornLib
 {
     [Serializable]
     public struct MornBeatAction<TEnum> where TEnum : Enum

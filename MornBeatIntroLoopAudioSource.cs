@@ -4,13 +4,19 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace MornBeat
+namespace MornLib
 {
-    internal sealed class MornBeatIntroLoopAudioSource : MonoBehaviour
+    internal sealed class MornBeatIntroLoopAudioSource
     {
-        [SerializeField] private AudioSource _audioSourceIntro;
-        [SerializeField] private AudioSource _audioSourceLoop;
+        private readonly AudioSource _audioSourceIntro;
+        private readonly AudioSource _audioSourceLoop;
         private CancellationTokenSource _cts;
+
+        internal MornBeatIntroLoopAudioSource(AudioSource introSource, AudioSource loopSource)
+        {
+            _audioSourceIntro = introSource;
+            _audioSourceLoop = loopSource;
+        }
 
         private bool Contain(AudioClip clip)
         {
@@ -18,12 +24,12 @@ namespace MornBeat
             {
                 return false;
             }
-            
+
             if (_audioSourceIntro.clip == clip)
             {
                 return true;
             }
-            
+
             if (_audioSourceLoop.clip == clip)
             {
                 return true;
@@ -31,7 +37,7 @@ namespace MornBeat
 
             return false;
         }
-        
+
         /// <summary> null可 </summary>
         public async UniTask LoadAsync(AudioClip introClip, AudioClip loopClip, bool needLoop = true, CancellationToken ct = default)
         {
@@ -55,9 +61,9 @@ namespace MornBeat
 
             if (startDspTime < AudioSettings.dspTime)
             {
-                MornBeatGlobal.LogError($"再生時刻が過去です。startDspTime: {startDspTime}, dspTime: {AudioSettings.dspTime}");
+                MornBeatGlobal.Logger.LogError($"再生時刻が過去です。startDspTime: {startDspTime}, dspTime: {AudioSettings.dspTime}");
             }
-            
+
             if (_audioSourceIntro.clip != null)
             {
                 // イントロ込みで再生
@@ -161,7 +167,7 @@ namespace MornBeat
             {
                 _audioSourceIntro.Pause();
             }
-            
+
             if (_audioSourceLoop.isPlaying)
             {
                 _audioSourceLoop.Pause();

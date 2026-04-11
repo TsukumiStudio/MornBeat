@@ -2,24 +2,24 @@ using System;
 using UniRx;
 using UnityEngine;
 
-namespace MornBeat
+namespace MornLib
 {
     [Serializable]
     public class MornBeatPlayModule
     {
-        [SerializeField] [ReadOnly] private MornBeatMemoSo _beatMemo;
+        [SerializeField] [ReadOnly] private MornBeatMusic _music;
         [SerializeField] [ReadOnly] private MornBeatTimingSolver _offsetTiming;
         [SerializeField] [ReadOnly] private MornBeatTimingSolver _pureTiming;
         private readonly Subject<MornBeatSetInfo> _initializeBeatSubject = new();
-        public MornBeatMemoSo BeatMemo => _beatMemo;
+        public MornBeatMusic Music => _music;
         public float SpeedScale => _offsetTiming.SpeedScale;
         public double CurrentBpm => _offsetTiming.CurrentBpm;
         public float BeatLengthF => _offsetTiming.BeatLengthF;
         public double CurrentBeatLength => _offsetTiming.CurrentBeatLength;
         public double StartDspTime => _offsetTiming.StartDspTime;
-        public int BeatCount => _beatMemo?.BeatCount ?? 0;
-        public int BeatTick => _beatMemo?.BeatTick ?? 0;
-        public int MeasureTick => _beatMemo?.MeasureTickCount ?? 0;
+        public int BeatCount => _music?.BeatCount ?? 0;
+        public int BeatTick => _music?.BeatTick ?? 0;
+        public int MeasureTick => _music?.MeasureTickCount ?? 0;
         /// <summary> ループ時に0から初期化（単位：秒）</summary>
         public double MusicPlayingTime => _offsetTiming.MusicPlayingTime;
         /// <summary> ループ後に値を継続（単位：秒）</summary>
@@ -35,17 +35,17 @@ namespace MornBeat
         public IObservable<Unit> OnLoop => _offsetTiming.OnLoop;
         public IObservable<Unit> OnEndBeat => _offsetTiming.OnEndBeat;
 
-        internal void SetBeatMemo(MornBeatSetInfo setInfo)
+        internal void SetMusic(MornBeatSetInfo setInfo)
         {
-            _beatMemo = setInfo.BeatMemo;
-            _offsetTiming.SetBeatMemo(setInfo);
-            _pureTiming.SetBeatMemo(setInfo);
+            _music = setInfo.Music;
+            _offsetTiming.SetMusic(setInfo);
+            _pureTiming.SetMusic(setInfo);
             _initializeBeatSubject.OnNext(setInfo);
         }
 
         internal void Reset()
         {
-            _beatMemo = null;
+            _music = null;
             _offsetTiming.Reset();
             _pureTiming.Reset();
         }
@@ -64,12 +64,12 @@ namespace MornBeat
 
         public float ConvertToTime(int tick)
         {
-            if (_beatMemo == null)
+            if (_music == null)
             {
                 return Mathf.Infinity;
             }
 
-            return _beatMemo.GetBeatTiming(tick);
+            return _music.GetBeatTiming(tick);
         }
 
         public int GetNearTick(out double nearDif)

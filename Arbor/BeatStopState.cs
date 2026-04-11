@@ -1,17 +1,17 @@
 ﻿ #if USE_ARBOR
-using System.Threading;
-using Arbor;
-using UnityEngine;
-using VContainer;
+ using System.Threading;
+ using Arbor;
+ using UnityEngine;
+ using VContainer;
 
-namespace MornBeat
+ namespace MornLib
 {
     internal class BeatStopState : StateBehaviour
     {
         [SerializeField] private StateLink _onComplete;
         [SerializeField] private float _stopDuration;
         [SerializeField] private bool _isIsolate;
-        [Inject] private MornBeatControllerMono _beatController;
+        [Inject] private MornBeatController _beatController;
 
         public override async void OnStateBegin()
         {
