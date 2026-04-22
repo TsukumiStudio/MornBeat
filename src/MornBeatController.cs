@@ -54,7 +54,6 @@ namespace MornLib
                 return;
             }
             
-            var startDspTime = startInfo.StartDspTime ?? AudioSettings.dspTime + DefaultStartDspTimeOffset;
             var fadeDuration = startInfo.FadeDuration ?? 0;
             var ct = startInfo.Ct;
 
@@ -62,6 +61,9 @@ namespace MornLib
             var prev = _audioSourceModule.GetCurrent();
             var next = _audioSourceModule.GetOther(true);
             await next.LoadAsync(music.IntroClip, music.Clip, music.IsLoop, ct);
+
+            // LoadAsync の所要時間によって startDspTime が過去になる事故を避けるため、Load 完了後に確定する
+            var startDspTime = startInfo.StartDspTime ?? AudioSettings.dspTime + DefaultStartDspTimeOffset;
             if (startDspTime < AudioSettings.dspTime)
             {
                 var cached = startDspTime;
