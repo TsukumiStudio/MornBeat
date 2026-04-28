@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -8,6 +9,37 @@ namespace MornBeat
     {
         internal const char OpenSplit = '[';
         internal const char CloseSplit = ']';
+
+        public static MornBeatMemoSo Create(
+            AudioClip clip,
+            List<float> timingList,
+            List<double> bpms,
+            List<double> bpmTimes,
+            int measureTickCount = 8,
+            int beatCount = 4,
+            float volume = 1f,
+            float offset = 0f,
+            float loopAdditionalTime = 0f,
+            bool isLoop = false,
+            int introTickSum = 0,
+            AudioClip introClip = null)
+        {
+            var memo = ScriptableObject.CreateInstance<MornBeatMemoSo>();
+            memo.InitForRuntime(
+                clip,
+                introClip,
+                isLoop,
+                introTickSum,
+                measureTickCount,
+                beatCount,
+                volume,
+                offset,
+                loopAdditionalTime,
+                timingList,
+                bpms,
+                bpmTimes);
+            return memo;
+        }
 
         internal static double InverseLerp(double a, double b, double value)
         {

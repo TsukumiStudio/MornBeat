@@ -43,6 +43,41 @@ namespace MornBeat
             _timingList = timingList;
         }
 
+        internal void InitForRuntime(
+            AudioClip clip,
+            AudioClip introClip,
+            bool isLoop,
+            int introTickSum,
+            int measureTickCount,
+            int beatCount,
+            float volume,
+            float offset,
+            float loopAdditionalTime,
+            List<float> timingList,
+            List<double> bpms,
+            List<double> bpmTimes)
+        {
+            _clip = clip;
+            _introClip = introClip;
+            _isLoop = isLoop;
+            _introTickSum = introTickSum;
+            _measureTickCount = measureTickCount;
+            _beatCount = beatCount;
+            _volume = volume;
+            _offset = offset;
+            _loopAdditionalTime = loopAdditionalTime;
+            _timingList = timingList ?? new List<float>();
+            _bpmAndTimeInfoList = new List<BpmAndTimeInfo>();
+            if (bpms != null && bpmTimes != null)
+            {
+                var count = Math.Min(bpms.Count, bpmTimes.Count);
+                for (var i = 0; i < count; i++)
+                {
+                    _bpmAndTimeInfoList.Add(new BpmAndTimeInfo { Bpm = bpms[i], Time = bpmTimes[i] });
+                }
+            }
+        }
+
         public float GetBeatTiming(int index)
         {
             if (index < 0 || TotalTickSum <= index) return Mathf.Infinity;
