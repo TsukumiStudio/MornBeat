@@ -7,7 +7,7 @@ namespace MornLib
     public sealed class MornBeatScaler : MonoBehaviour
     {
         [Inject] private MornBeatController _beatController;
-        [SerializeField] private MornBeatScaleSettings _settings;
+        [SerializeField] private MornBeatScaleSettings _override;
         [SerializeField] private bool _isAutoStart = true;
         private Vector3 _originScale;
         private Vector3 _adjustedAimScale;
@@ -28,12 +28,12 @@ namespace MornLib
 
         private void Start()
         {
-            if (_settings == null) _settings = MornBeatGlobal.I.DefaultScaleSettings;
+            if (_override == null) _override = MornBeatGlobal.I.DefaultScaleSettings;
             _originScale = transform.localScale;
             _adjustedAimScale = CalcAdjustedAimScale();
             _isActive = _isAutoStart;
             _beatController.PlayModule.OnBeat
-                .Where(x => _isActive && x.IsJustForAnyBeat(_settings.PerBeat))
+                .Where(x => _isActive && x.IsJustForAnyBeat(_override.PerBeat))
                 .Subscribe(_ => transform.localScale = _adjustedAimScale)
                 .AddTo(this);
         }
@@ -41,13 +41,13 @@ namespace MornLib
         private void Update()
         {
             if (!_isActive) return;
-            var scale = Vector3.Lerp(transform.localScale, _originScale, Time.deltaTime * _settings.LerpSpeed);
+            var scale = Vector3.Lerp(transform.localScale, _originScale, Time.deltaTime * _override.LerpSpeed);
             transform.localScale = scale;
         }
 
         private Vector3 CalcAdjustedAimScale()
         {
-            var aim = _settings.AimScale;
+            var aim = _override.AimScale;
             var rt = transform as RectTransform;
             if (rt == null) return aim;
 
