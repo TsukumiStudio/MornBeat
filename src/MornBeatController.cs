@@ -49,14 +49,14 @@ namespace MornLib
             Assert.IsNotNull(startInfo.Music);
             var music = startInfo.Music;
             var isForceInitialize = startInfo.IsForceInitialize ?? false;
-            if (_playModule.Music == music && isForceInitialize == false)
+            if ((_playModule.Music == music || (_playModule.Music != null && music != null && _playModule.Music.name == music.name))
+                && isForceInitialize == false)
             {
                 return;
             }
-            
+
             var fadeDuration = startInfo.FadeDuration ?? 0;
             var ct = startInfo.Ct;
-
             IsPaused = false;
             var prev = _audioSourceModule.GetCurrent();
             var next = _audioSourceModule.GetOther(true);
@@ -74,8 +74,7 @@ namespace MornLib
             _playModule.SetMusic(new MornBeatSetInfo(music, startDspTime));
             var taskList = new List<UniTask>
             {
-                prev.UnloadWithFadeOutAsync(next, fadeDuration, ct),
-                next.PlayWithFadeIn(startDspTime, fadeDuration, ct),
+                prev.UnloadWithFadeOutAsync(next, fadeDuration, ct), next.PlayWithFadeIn(startDspTime, fadeDuration, ct),
             };
             await UniTask.WhenAll(taskList);
         }
@@ -120,8 +119,7 @@ namespace MornLib
         /// <summary>音楽を再開する（カウントダウン対応）</summary>
         /// <param name="resumeDspTime">再開時のdspTime（カウントダウン等で調整可能）</param>
         /// <param name="onCountdownTick">カウントダウン中に呼ばれるコールバック（残り秒数を受け取る）</param>
-        public async UniTask ResumeAsync(double resumeDspTime, Action<float> onCountdownTick,
-            CancellationToken ct = default)
+        public async UniTask ResumeAsync(double resumeDspTime, Action<float> onCountdownTick, CancellationToken ct = default)
         {
             if (!IsPaused)
             {
