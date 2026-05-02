@@ -1,11 +1,22 @@
-#if USE_ARBOR
+#if USE_ARBOR || USE_MORNSTATE
+#if USE_MORNSTATE
+using MornLib;
+using StateLink = MornLib.Connection;
+#else
 using Arbor;
+#endif
+using System;
 using UnityEngine;
 using VContainer;
 
 namespace MornLib
 {
+    [Serializable]
+#if USE_MORNSTATE
+    internal class BeatPlayState : MornStateBehaviour
+#else
     internal class BeatPlayState : StateBehaviour
+#endif
     {
         [SerializeField] private MornBeatMusic _music;
         [SerializeField] private bool _executeIsolated;

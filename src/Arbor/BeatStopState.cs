@@ -1,12 +1,23 @@
-﻿ #if USE_ARBOR
- using System.Threading;
- using Arbor;
- using UnityEngine;
- using VContainer;
+#if USE_ARBOR || USE_MORNSTATE
+using System.Threading;
+using System;
+#if USE_MORNSTATE
+using MornLib;
+using StateLink = MornLib.Connection;
+#else
+using Arbor;
+#endif
+using UnityEngine;
+using VContainer;
 
- namespace MornLib
+namespace MornLib
 {
+    [Serializable]
+#if USE_MORNSTATE
+    internal class BeatStopState : MornStateBehaviour
+#else
     internal class BeatStopState : StateBehaviour
+#endif
     {
         [SerializeField] private StateLink _onComplete;
         [SerializeField] private float _stopDuration;
