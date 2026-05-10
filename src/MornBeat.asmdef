@@ -16,12 +16,6 @@
   "precompiledReferences": [],
   "autoReferenced": true,
   "defineConstraints": [],
-  "versionDefines": [
-    {
-      "name": "com.caitsithware.arbor",
-      "expression": "",
-      "define": "USE_ARBOR"
-    }
-  ],
+  "versionDefines": [],
   "noEngineReferences": false
 }

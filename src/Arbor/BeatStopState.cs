@@ -3,7 +3,7 @@ using System.Threading;
 using System;
 #if USE_MORNSTATE
 using MornLib;
-using StateLink = MornLib.Connection;
+using StateLink = MornLib.StateLink;
 #else
 using Arbor;
 #endif
