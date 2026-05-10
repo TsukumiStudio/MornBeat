@@ -1,5 +1,4 @@
-#if USE_ARBOR || USE_MORNSTATE
-#if USE_MORNSTATE
+#if !USE_ARBOR
 using MornLib;
 #else
 using Arbor;
@@ -11,7 +10,7 @@ using VContainer;
 namespace MornLib
 {
     [Serializable]
-#if USE_MORNSTATE
+#if !USE_ARBOR
     internal class BeatPlayState : MornStateBehaviour
 #else
     internal class BeatPlayState : StateBehaviour
@@ -30,4 +29,3 @@ namespace MornLib
         }
     }
 }
-#endif

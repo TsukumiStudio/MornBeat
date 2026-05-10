@@ -1,7 +1,6 @@
-#if USE_ARBOR || USE_MORNSTATE
 using System.Threading;
 using System;
-#if USE_MORNSTATE
+#if !USE_ARBOR
 using MornLib;
 #else
 using Arbor;
@@ -12,7 +11,7 @@ using VContainer;
 namespace MornLib
 {
     [Serializable]
-#if USE_MORNSTATE
+#if !USE_ARBOR
     internal class BeatStopState : MornStateBehaviour
 #else
     internal class BeatStopState : StateBehaviour
@@ -31,4 +30,3 @@ namespace MornLib
         }
     }
 }
-#endif
