@@ -1,7 +1,6 @@
 #if USE_ARBOR || USE_MORNSTATE
 #if USE_MORNSTATE
 using MornLib;
-using StateLink = MornLib.StateLink;
 #else
 using Arbor;
 #endif
