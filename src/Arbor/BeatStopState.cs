@@ -1,8 +1,9 @@
 using System.Threading;
 using System;
-#if !USE_ARBOR
+#if USE_MORNSTATE || USE_ARBOR
+#if USE_MORNSTATE
 using MornLib;
-#else
+#elif USE_ARBOR
 using Arbor;
 #endif
 using UnityEngine;
@@ -11,9 +12,9 @@ using VContainer;
 namespace MornLib
 {
     [Serializable]
-#if !USE_ARBOR
+#if USE_MORNSTATE
     internal class BeatStopState : MornStateBehaviour
-#else
+#elif USE_ARBOR
     internal class BeatStopState : StateBehaviour
 #endif
     {
@@ -30,3 +31,4 @@ namespace MornLib
         }
     }
 }
+#endif // USE_MORNSTATE || USE_ARBOR
