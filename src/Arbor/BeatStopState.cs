@@ -1,5 +1,5 @@
-using System.Threading;
 using System;
+using System.Threading;
 #if USE_MORNSTATE || USE_ARBOR
 #if USE_MORNSTATE
 using MornLib;
@@ -18,15 +18,23 @@ namespace MornLib
     internal class BeatStopState : StateBehaviour
 #endif
     {
+        [Inject] private readonly MornBeatController _beatController;
         [SerializeField] private StateLink _onComplete;
         [SerializeField] private float _stopDuration;
         [SerializeField] private bool _isIsolate;
-        [Inject] private MornBeatController _beatController;
 
         public override async void OnStateBegin()
         {
-            CancellationToken? ct = _isIsolate ? null : CancellationTokenOnEnd;
-            await _beatController.StopBeatAsync(_stopDuration, ct);
+            try
+            {
+                CancellationToken? ct = _isIsolate ? null : CancellationTokenOnEnd;
+                await _beatController.StopBeatAsync(_stopDuration, ct);
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+
             Transition(_onComplete);
         }
     }

@@ -17,15 +17,23 @@ namespace MornLib
     internal class BeatPlayState : StateBehaviour
 #endif
     {
+        [Inject] private readonly MornBeatController _beatController;
         [SerializeField] private MornBeatMusic _music;
         [SerializeField] private bool _executeIsolated;
         [SerializeField] private StateLink _onComplete;
-        [Inject] private MornBeatController _beatController;
 
         public override async void OnStateBegin()
         {
-            var ct = _executeIsolated ? Application.exitCancellationToken : CancellationTokenOnEnd;
-            await _beatController.StartAsync(new MornBeatStartInfo { Music = _music, Ct = ct, });
+            try
+            {
+                var ct = _executeIsolated ? Application.exitCancellationToken : CancellationTokenOnEnd;
+                await _beatController.StartAsync(new MornBeatStartInfo { Music = _music, Ct = ct, });
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+
             Transition(_onComplete);
         }
     }
