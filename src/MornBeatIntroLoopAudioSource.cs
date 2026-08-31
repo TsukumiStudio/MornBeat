@@ -11,6 +11,8 @@ namespace MornLib
         private readonly AudioSource _audioSourceIntro;
         private readonly AudioSource _audioSourceLoop;
         private CancellationTokenSource _cts;
+        private double _scheduledEndDspTime;
+        public bool CanReuse { get; private set; } = true;
 
         internal MornBeatIntroLoopAudioSource(AudioSource introSource, AudioSource loopSource)
         {
@@ -41,6 +43,8 @@ namespace MornLib
         /// <summary> null可 </summary>
         public async UniTask LoadAsync(AudioClip introClip, AudioClip loopClip, bool needLoop = true, CancellationToken ct = default)
         {
+            CanReuse = false;
+            _scheduledEndDspTime = 0;
             _audioSourceIntro.clip = introClip;
             _audioSourceIntro.loop = false;
             _audioSourceLoop.clip = loopClip;
@@ -69,11 +73,17 @@ namespace MornLib
                 // イントロ込みで再生
                 _audioSourceIntro.PlayScheduled(startDspTime);
                 _audioSourceLoop.PlayScheduled(startDspTime + _audioSourceIntro.clip.length);
+                _scheduledEndDspTime = _audioSourceLoop.loop
+                    ? double.PositiveInfinity
+                    : startDspTime + _audioSourceIntro.clip.length + (_audioSourceLoop.clip == null ? 0 : _audioSourceLoop.clip.length);
             }
             else if (_audioSourceLoop.clip != null)
             {
                 // イントロ無しで再生
                 _audioSourceLoop.PlayScheduled(startDspTime);
+                _scheduledEndDspTime = _audioSourceLoop.loop
+                    ? double.PositiveInfinity
+                    : startDspTime + _audioSourceLoop.clip.length;
             }
 
             while (AudioSettings.dspTime < startDspTime)
@@ -102,6 +112,30 @@ namespace MornLib
             await UniTask.WhenAll(taskList);
             _audioSourceIntro.clip = null;
             _audioSourceLoop.clip = null;
+            _scheduledEndDspTime = 0;
+            CanReuse = true;
+        }
+
+        public async UniTask UnloadAfterScheduledEndAsync(MornBeatIntroLoopAudioSource other, CancellationToken ct = default)
+        {
+            try
+            {
+                if (double.IsInfinity(_scheduledEndDspTime))
+                {
+                    await UnloadWithFadeOutAsync(other, 0, ct);
+                    return;
+                }
+
+                while (AudioSettings.dspTime < _scheduledEndDspTime)
+                {
+                    await UniTask.Yield(PlayerLoopTiming.Update, ct);
+                }
+
+                await UnloadWithFadeOutAsync(other, 0, ct);
+            }
+            catch (System.OperationCanceledException)
+            {
+            }
         }
 
         public async UniTask FadeInAsync(float duration, CancellationToken ct = default)
@@ -127,6 +161,7 @@ namespace MornLib
                 {
                     _audioSourceIntro.Stop();
                     _audioSourceLoop.Stop();
+                    _scheduledEndDspTime = 0;
                 }
 
                 return;
@@ -157,6 +192,7 @@ namespace MornLib
             {
                 _audioSourceIntro.Stop();
                 _audioSourceLoop.Stop();
+                _scheduledEndDspTime = 0;
             }
         }
 

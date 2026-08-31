@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Audio;
 
@@ -8,14 +10,19 @@ namespace MornLib
     internal class MornBeatAudioSourceModule
     {
         [SerializeField] private AudioMixerGroup _mixerGroup;
-        private bool _isUsingAudioSourceA;
-        private MornBeatIntroLoopAudioSource _audioSourceA;
-        private MornBeatIntroLoopAudioSource _audioSourceB;
+        private readonly List<MornBeatIntroLoopAudioSource> _audioSources = new();
+        private MornBeatIntroLoopAudioSource _current;
+        private const int AudioSourceSetCount = 4;
 
         public void Initialize(GameObject owner)
         {
-            _audioSourceA = CreateChild(owner, "A");
-            _audioSourceB = CreateChild(owner, "B");
+            _audioSources.Clear();
+            for (var i = 0; i < AudioSourceSetCount; i++)
+            {
+                _audioSources.Add(CreateChild(owner, ((char)('A' + i)).ToString()));
+            }
+
+            _current = _audioSources[0];
         }
 
         private MornBeatIntroLoopAudioSource CreateChild(GameObject owner, string label)
@@ -37,10 +44,10 @@ namespace MornLib
 
         public MornBeatIntroLoopAudioSource GetCurrent(bool changeSource = false)
         {
-            var result = _isUsingAudioSourceA ? _audioSourceA : _audioSourceB;
+            var result = _current;
             if (changeSource)
             {
-                _isUsingAudioSourceA = !_isUsingAudioSourceA;
+                _current = GetReusableOther();
             }
 
             return result;
@@ -48,13 +55,29 @@ namespace MornLib
 
         public MornBeatIntroLoopAudioSource GetOther(bool changeSource = false)
         {
-            var result = _isUsingAudioSourceA ? _audioSourceB : _audioSourceA;
+            var result = GetReusableOther();
             if (changeSource)
             {
-                _isUsingAudioSourceA = !_isUsingAudioSourceA;
+                _current = result;
             }
 
             return result;
+        }
+
+        public void SetCurrent(MornBeatIntroLoopAudioSource source)
+        {
+            _current = source;
+        }
+
+        private MornBeatIntroLoopAudioSource GetReusableOther()
+        {
+            var reusable = _audioSources.FirstOrDefault(x => x != _current && x.CanReuse);
+            if (reusable != null)
+            {
+                return reusable;
+            }
+
+            return _audioSources.First(x => x != _current);
         }
     }
 }

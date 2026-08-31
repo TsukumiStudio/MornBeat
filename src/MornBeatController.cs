@@ -79,6 +79,28 @@ namespace MornLib
             await UniTask.WhenAll(taskList);
         }
 
+        public async UniTask QueueStartAsync(MornBeatStartInfo startInfo)
+        {
+            Assert.IsNotNull(startInfo.Music);
+            var music = startInfo.Music;
+            var ct = startInfo.Ct;
+            var startDspTime = startInfo.StartDspTime ?? AudioSettings.dspTime + DefaultStartDspTimeOffset;
+            if (startDspTime < AudioSettings.dspTime)
+            {
+                var cached = startDspTime;
+                startDspTime = AudioSettings.dspTime + DefaultStartDspTimeOffset;
+                MornBeatGlobal.Logger.LogError($"再生時刻が過去のため補正します。[{cached} -> {startDspTime}]");
+            }
+
+            var prev = _audioSourceModule.GetCurrent();
+            var next = _audioSourceModule.GetOther();
+            await next.LoadAsync(music.IntroClip, music.Clip, music.IsLoop, ct);
+            await next.PlayWithFadeIn(startDspTime, 0, ct);
+            _audioSourceModule.SetCurrent(next);
+            _playModule.SetMusic(new MornBeatSetInfo(music, startDspTime));
+            prev.UnloadAfterScheduledEndAsync(next, ct).Forget();
+        }
+
         public async UniTask StopBeatAsync(float duration = 0, CancellationToken? ct = null)
         {
             ct ??= destroyCancellationToken;
