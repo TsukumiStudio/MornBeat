@@ -12,7 +12,9 @@ using VContainer;
 namespace MornLib
 {
     [Serializable]
+#if USE_MORNSTATE
     [MornStateMenu("Beat")]
+#endif
 #if USE_MORNSTATE
     internal class MornBeatAnimationState : MornStateBehaviour
 #elif USE_ARBOR
