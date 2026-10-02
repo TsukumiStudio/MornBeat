@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -46,6 +46,7 @@ namespace MornLib
 
         public async UniTask StartAsync(MornBeatStartInfo startInfo)
         {
+            _playModule.EnsureNotPreparing();
             Assert.IsNotNull(startInfo.Music);
             var music = startInfo.Music;
             var isForceInitialize = startInfo.IsForceInitialize ?? false;
@@ -58,9 +59,11 @@ namespace MornLib
             var fadeDuration = startInfo.FadeDuration ?? 0;
             var ct = startInfo.Ct;
             IsPaused = false;
+            _playModule.IsControllerPaused = false;
             var prev = _audioSourceModule.GetCurrent();
             var next = _audioSourceModule.GetOther(true);
             await next.LoadAsync(music.IntroClip, music.Clip, music.IsLoop, ct);
+            _playModule.EnsureNotPreparing();
 
             // LoadAsync の所要時間によって startDspTime が過去になる事故を避けるため、Load 完了後に確定する
             var startDspTime = startInfo.StartDspTime ?? AudioSettings.dspTime + DefaultStartDspTimeOffset;
@@ -91,6 +94,7 @@ namespace MornLib
         /// <param name="pauseTimeScale">Time.timeScaleを0にするかどうか</param>
         public void Pause(bool pauseTimeScale = true)
         {
+            _playModule.EnsureNotPreparing();
             if (IsPaused)
             {
                 MornBeatGlobal.Logger.LogWarning("既にポーズ中です");
@@ -98,6 +102,7 @@ namespace MornLib
             }
 
             IsPaused = true;
+            _playModule.IsControllerPaused = true;
             _pauseStartDspTime = AudioSettings.dspTime;
             if (pauseTimeScale)
             {
@@ -121,6 +126,7 @@ namespace MornLib
         /// <param name="onCountdownTick">カウントダウン中に呼ばれるコールバック（残り秒数を受け取る）</param>
         public async UniTask ResumeAsync(double resumeDspTime, Action<float> onCountdownTick, CancellationToken ct = default)
         {
+            _playModule.EnsureNotPreparing();
             if (!IsPaused)
             {
                 MornBeatGlobal.Logger.LogWarning("ポーズ中ではありません");
@@ -155,6 +161,7 @@ namespace MornLib
             current.UnPause();
             _onResumeSubject.OnNext(Unit.Default);
             IsPaused = false;
+            _playModule.IsControllerPaused = false;
         }
     }
 }
