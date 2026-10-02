@@ -7,6 +7,8 @@ namespace MornLib
     public class MornBeatTimingSolver
     {
         private MornBeatMusic _music;
+        internal double? PreparationDspTime;
+        private double CurrentDspTime => PreparationDspTime ?? AudioSettings.dspTime;
         private double _currentBpm = 120;
         private int _tick;
         private bool _waitLoop;
@@ -24,14 +26,14 @@ namespace MornLib
         public double CurrentBeatLength => 60d / CurrentBpm;
         public double StartDspTime => _startDspTime;
         /// <summary> ループ時に0から初期化（単位：秒）</summary>
-        public double MusicPlayingTime => AudioSettings.dspTime
+        public double MusicPlayingTime => CurrentDspTime
                                           - _loopStartDspTime
                                           + _offsetTime
                                           - _pauseOffset
                                           - _pausingTime
                                           + (_music != null ? _music.Offset : 0);
         /// <summary> ループ後に値を継続（単位：秒）</summary>
-        public double MusicPlayingTimeNoRepeat => AudioSettings.dspTime
+        public double MusicPlayingTimeNoRepeat => CurrentDspTime
                                                   - _startDspTime
                                                   + _offsetTime
                                                   - _pauseOffset
