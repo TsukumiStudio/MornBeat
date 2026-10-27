@@ -67,9 +67,15 @@ namespace MornLib
         }
 
         /// <summary>曲を設定し、指定した拍から刻みを始める (途中から再生する演出用)。描画準備中でも呼べる</summary>
-        /// <param name="dspAtTick">tick の位置の音が鳴る DSP 時刻</param>
+        /// <param name="dspAtTick">譜面時刻 GetBeatTiming(tick) に対応するクリップ位置が鳴る DSP 時刻 (Offset 補正前)</param>
         public void SetMusicAt(MornBeatMusic music, int tick, double dspAtTick)
         {
+            // SetMusic が一時停止のオフセットを初期化するため、再開時に時計が飛ぶ
+            if (IsControllerPaused)
+            {
+                throw new InvalidOperationException("一時停止中は SetMusicAt を呼べません");
+            }
+
             if (tick < 0 || music.TotalTickSum <= tick)
             {
                 throw new ArgumentOutOfRangeException(nameof(tick), tick, "曲の範囲外の拍です");
