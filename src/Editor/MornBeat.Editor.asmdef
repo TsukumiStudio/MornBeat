@@ -1,0 +1,18 @@
+{
+  "name": "MornBeat.Editor",
+  "rootNamespace": "MornLib",
+  "references": [
+    "GUID:8cc21ec2dd30faf40a7d0371faa0b2c0"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

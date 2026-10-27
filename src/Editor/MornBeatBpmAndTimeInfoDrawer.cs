@@ -1,11 +1,10 @@
-#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
 
 namespace MornLib
 {
     [CustomPropertyDrawer(typeof(MornBeatMusic.BpmAndTimeInfo))]
-    internal sealed class BpmAndTimeInfoDrawer : PropertyDrawer
+    internal sealed class MornBeatBpmAndTimeInfoDrawer : PropertyDrawer
     {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
@@ -32,4 +31,3 @@ namespace MornLib
         }
     }
 }
-#endif
