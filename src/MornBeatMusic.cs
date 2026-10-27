@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -41,7 +40,7 @@ namespace MornLib
         public float LoopLength => _clip == null ? 0 : _clip.length + _loopAdditionalTime;
         public float TotalLength => IntroLength + LoopLength;
         public float Volume => _volume;
-        internal float Offset => _offset;
+        public float Offset => _offset;
 
         public void OverrideTimingList(List<float> timingList)
         {
@@ -50,7 +49,11 @@ namespace MornLib
 
         public float GetBeatTiming(int index)
         {
-            if (index < 0 || TotalTickSum <= index) return Mathf.Infinity;
+            if (index < 0 || TotalTickSum <= index)
+            {
+                return Mathf.Infinity;
+            }
+
             return _timingList[index];
         }
 
@@ -71,7 +74,10 @@ namespace MornLib
                 if (Math.Floor(beat) < Math.Floor(beat + dif))
                 {
                     _timingList.Add((float)time % totalLength);
-                    if (time < IntroLength) _introTickSum++;
+                    if (time < IntroLength)
+                    {
+                        _introTickSum++;
+                    }
                 }
 
                 beat += dif;
@@ -79,7 +85,11 @@ namespace MornLib
             }
 
             var remove = _timingList.Count % _measureTickCount;
-            for (var i = 0; i < remove; i++) _timingList.RemoveAt(_timingList.Count - 1);
+            for (var i = 0; i < remove; i++)
+            {
+                _timingList.RemoveAt(_timingList.Count - 1);
+            }
+
 #if UNITY_EDITOR
             UnityEditor.EditorUtility.SetDirty(this);
 #endif
@@ -95,10 +105,18 @@ namespace MornLib
                     return _bpmAndTimeInfoList[0].Bpm;
             }
 
-            if (time <= _bpmAndTimeInfoList[0].Time) return _bpmAndTimeInfoList[0].Bpm;
+            if (time <= _bpmAndTimeInfoList[0].Time)
+            {
+                return _bpmAndTimeInfoList[0].Bpm;
+            }
+
             for (var i = 1; i < _bpmAndTimeInfoList.Count; i++)
             {
-                if (_bpmAndTimeInfoList[i].Time <= time) continue;
+                if (_bpmAndTimeInfoList[i].Time <= time)
+                {
+                    continue;
+                }
+
                 var begin = _bpmAndTimeInfoList[i - 1];
                 var end = _bpmAndTimeInfoList[i];
                 var t1 = MornBeatUtil.InverseLerp(begin.Time, end.Time, time);
@@ -110,7 +128,11 @@ namespace MornLib
 
         public float GetMinBpm()
         {
-            if (_bpmAndTimeInfoList.Count == 0) return 60f;
+            if (_bpmAndTimeInfoList.Count == 0)
+            {
+                return 60f;
+            }
+
             var minBpm = _bpmAndTimeInfoList[0].Bpm;
             for (var i = 1; i < _bpmAndTimeInfoList.Count; i++)
             {
@@ -125,7 +147,11 @@ namespace MornLib
 
         public float GetMaxBpm()
         {
-            if (_bpmAndTimeInfoList.Count == 0) return 60f;
+            if (_bpmAndTimeInfoList.Count == 0)
+            {
+                return 60f;
+            }
+
             var maxBpm = _bpmAndTimeInfoList[0].Bpm;
             for (var i = 1; i < _bpmAndTimeInfoList.Count; i++)
             {
@@ -145,55 +171,4 @@ namespace MornLib
             public double Time;
         }
     }
-
-#if UNITY_EDITOR
-    [CustomEditor(typeof(MornBeatMusic))]
-    internal sealed class MornBeatMusicEditor : Editor
-    {
-        private MornBeatMusic _music;
-
-        private void OnEnable()
-        {
-            _music = (MornBeatMusic)target;
-        }
-
-        public override void OnInspectorGUI()
-        {
-            DrawDefaultInspector();
-            GUILayout.Space(10);
-            if (GUILayout.Button("MakeBeat", GUILayout.Height(30)))
-            {
-                _music.MakeBeat();
-            }
-        }
-    }
-
-    [CustomPropertyDrawer(typeof(MornBeatMusic.BpmAndTimeInfo))]
-    internal sealed class BpmAndTimeInfoDrawer : PropertyDrawer
-    {
-        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
-        {
-            EditorGUI.BeginProperty(position, label, property);
-            var labelRect = new Rect(position.x, position.y, EditorGUIUtility.labelWidth, position.height);
-            EditorGUI.LabelField(labelRect, label);
-            var fieldX = position.x + EditorGUIUtility.labelWidth + 2;
-            var fieldW = (position.width - EditorGUIUtility.labelWidth - 2 - 20) / 2;
-            var bpmSp = property.FindPropertyRelative(nameof(MornBeatMusic.BpmAndTimeInfo.Bpm));
-            var timeSp = property.FindPropertyRelative(nameof(MornBeatMusic.BpmAndTimeInfo.Time));
-            var bpmLabelW = 30f;
-            var timeLabelW = 30f;
-            var gap = 4f;
-            EditorGUI.LabelField(new Rect(fieldX, position.y, bpmLabelW, position.height), "Bpm");
-            EditorGUI.PropertyField(
-                new Rect(fieldX + bpmLabelW, position.y, fieldW - bpmLabelW, position.height),
-                bpmSp, GUIContent.none);
-            EditorGUI.LabelField(
-                new Rect(fieldX + fieldW + gap, position.y, timeLabelW, position.height), "Time");
-            EditorGUI.PropertyField(
-                new Rect(fieldX + fieldW + gap + timeLabelW, position.y, fieldW - timeLabelW, position.height),
-                timeSp, GUIContent.none);
-            EditorGUI.EndProperty();
-        }
-    }
-#endif
 }
