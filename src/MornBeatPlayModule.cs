@@ -66,11 +66,19 @@ namespace MornLib
             _initializeBeatSubject.OnNext(setInfo);
         }
 
-        /// <summary>曲を設定し、指定した拍から刻みを始める (途中から再生する演出用)</summary>
-        public void SetMusicAt(MornBeatSetInfo setInfo, int tick)
+        /// <summary>曲を設定し、指定した拍から刻みを始める (途中から再生する演出用)。描画準備中でも呼べる</summary>
+        /// <param name="dspAtTick">tick の位置の音が鳴る DSP 時刻</param>
+        public void SetMusicAt(MornBeatMusic music, int tick, double dspAtTick)
         {
-            SetMusic(setInfo);
-            var bpm = setInfo.Music.GetBpm(setInfo.Music.GetBeatTiming(tick));
+            if (tick < 0 || music.TotalTickSum <= tick)
+            {
+                throw new ArgumentOutOfRangeException(nameof(tick), tick, "曲の範囲外の拍です");
+            }
+
+            // 通常再生と同じく、曲の先頭が鳴る時刻を開始時刻とする (Offset は MusicPlayingTime 側で加わる)
+            var tickTime = music.GetBeatTiming(tick);
+            SetMusic(new MornBeatSetInfo(music, dspAtTick - tickTime));
+            var bpm = music.GetBpm(tickTime);
             _offsetTiming.SeekTick(tick, bpm);
             _pureTiming.SeekTick(tick, bpm);
         }
