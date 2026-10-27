@@ -4,11 +4,9 @@ using UnityEngine;
 
 namespace MornLib
 {
-    public class MornBeatTimingSolver
+    public sealed class MornBeatTimingSolver
     {
         private MornBeatMusic _music;
-        internal double? PreparationDspTime;
-        private double CurrentDspTime => PreparationDspTime ?? AudioSettings.dspTime;
         private double _currentBpm = 120;
         private int _tick;
         private bool _waitLoop;
@@ -20,6 +18,7 @@ namespace MornLib
         private readonly Subject<MornBeatTimingInfo> _beatSubject = new();
         private readonly Subject<Unit> _loopSubject = new();
         private readonly Subject<Unit> _endBeatSubject = new();
+        internal double? PreparationDspTime { get; set; }
         public float SpeedScale => (float)_currentBpm / 120f;
         public double CurrentBpm => _currentBpm;
         public float BeatLengthF => (float)(60d / CurrentBpm);
@@ -47,6 +46,14 @@ namespace MornLib
         public IObservable<MornBeatTimingInfo> OnBeat => _beatSubject;
         public IObservable<Unit> OnLoop => _loopSubject;
         public IObservable<Unit> OnEndBeat => _endBeatSubject;
+        private double CurrentDspTime => PreparationDspTime ?? AudioSettings.dspTime;
+
+        /// <summary>曲の途中の拍から刻みを再開する。直前に SetMusic で曲を設定しておくこと</summary>
+        internal void SeekTick(int tick, double bpm)
+        {
+            _tick = tick;
+            _currentBpm = bpm;
+        }
 
         internal void SetMusic(MornBeatSetInfo setInfo)
         {
@@ -83,7 +90,7 @@ namespace MornLib
             {
                 return;
             }
-            
+
             var time = MusicPlayingTime;
             if (_waitLoop)
             {
@@ -127,7 +134,7 @@ namespace MornLib
                 nearDif = double.MaxValue;
                 return -1;
             }
-            
+
             var preTick = _tick;
             var nexTick = preTick + 1;
             var preTime = _music.GetBeatTiming(preTick);

@@ -5,44 +5,15 @@ using UnityEngine;
 namespace MornLib
 {
     [Serializable]
-    public class MornBeatPlayModule
+    public sealed class MornBeatPlayModule
     {
+        private readonly MornBeatTimingSolver _offsetTiming = new();
+        private readonly MornBeatTimingSolver _pureTiming = new();
+        private readonly Subject<MornBeatSetInfo> _initializeBeatSubject = new();
         private MornBeatMusic _music;
         private PreparationClockScope _preparationClock;
         public bool IsClockSuspendedForPreparation => _preparationClock != null;
         internal bool IsControllerPaused { get; set; }
-        /// <summary>
-        /// Main-thread-only preparation scope. Suppresses beat dispatch and snapshots DSP,
-        /// but does not pause audio or preserve playback position on disposal.
-        /// Reset ends the scope. Reinitialize music before gameplay after preparation.
-        /// Normal Pause/Resume and controller playback starts cannot overlap this scope.
-        /// </summary>
-        public IDisposable SuspendClockForPreparation()
-        {
-            if(IsControllerPaused)throw new InvalidOperationException("Cannot prepare a paused controller");
-            if(_preparationClock != null)throw new InvalidOperationException("Preparation clock already suspended");
-            return _preparationClock=new PreparationClockScope(this);
-        }
-        private sealed class PreparationClockScope : IDisposable
-        {
-            private MornBeatPlayModule _owner;
-            public PreparationClockScope(MornBeatPlayModule owner)
-            {
-                _owner=owner;var dsp=AudioSettings.dspTime;
-                owner._offsetTiming.PreparationDspTime=dsp;owner._pureTiming.PreparationDspTime=dsp;
-            }
-            public void Dispose()
-            {
-                if(_owner==null)return;
-                var owner=_owner;_owner=null;
-                if(!ReferenceEquals(owner._preparationClock,this))return;
-                owner._offsetTiming.PreparationDspTime=null;owner._pureTiming.PreparationDspTime=null;
-                owner._preparationClock=null;
-            }
-        }
-        private readonly MornBeatTimingSolver _offsetTiming = new();
-        private readonly MornBeatTimingSolver _pureTiming = new();
-        private readonly Subject<MornBeatSetInfo> _initializeBeatSubject = new();
         public MornBeatMusic Music => _music;
         public float SpeedScale => _offsetTiming.SpeedScale;
         public double CurrentBpm => _offsetTiming.CurrentBpm;
@@ -67,6 +38,26 @@ namespace MornLib
         public IObservable<Unit> OnLoop => _offsetTiming.OnLoop;
         public IObservable<Unit> OnEndBeat => _offsetTiming.OnEndBeat;
 
+        /// <summary>
+        /// 描画準備用に拍の進行を止めるスコープを返す (メインスレッド専用)。拍の通知を止めて DSP 時刻を固定するが、
+        /// 音声の一時停止や破棄時の再生位置の復元はしない。Reset でもスコープは終わる。準備後は曲を設定し直してから再生する。
+        /// 通常の Pause/Resume やコントローラーからの再生開始とは重ねられない
+        /// </summary>
+        public IDisposable SuspendClockForPreparation()
+        {
+            if (IsControllerPaused)
+            {
+                throw new InvalidOperationException("Cannot prepare a paused controller");
+            }
+
+            if (_preparationClock != null)
+            {
+                throw new InvalidOperationException("Preparation clock already suspended");
+            }
+
+            return _preparationClock = new PreparationClockScope(this);
+        }
+
         internal void SetMusic(MornBeatSetInfo setInfo)
         {
             _music = setInfo.Music;
@@ -75,10 +66,21 @@ namespace MornLib
             _initializeBeatSubject.OnNext(setInfo);
         }
 
+        /// <summary>曲を設定し、指定した拍から刻みを始める (途中から再生する演出用)</summary>
+        public void SetMusicAt(MornBeatSetInfo setInfo, int tick)
+        {
+            SetMusic(setInfo);
+            var bpm = setInfo.Music.GetBpm(setInfo.Music.GetBeatTiming(tick));
+            _offsetTiming.SeekTick(tick, bpm);
+            _pureTiming.SeekTick(tick, bpm);
+        }
+
         internal void EnsureNotPreparing()
         {
-            if(IsClockSuspendedForPreparation)
+            if (IsClockSuspendedForPreparation)
+            {
                 throw new InvalidOperationException("Normal playback/Pause/Resume cannot overlap preparation");
+            }
         }
 
         internal void Reset()
@@ -91,7 +93,11 @@ namespace MornLib
 
         internal void UpdateBeat()
         {
-            if(IsClockSuspendedForPreparation)return;
+            if (IsClockSuspendedForPreparation)
+            {
+                return;
+            }
+
             _offsetTiming.UpdateBeat();
             _pureTiming.UpdateBeat();
         }
@@ -127,6 +133,38 @@ namespace MornLib
         {
             _offsetTiming.EndPausing(pausingTime);
             _pureTiming.EndPausing(pausingTime);
+        }
+
+        private sealed class PreparationClockScope : IDisposable
+        {
+            private MornBeatPlayModule _owner;
+
+            public PreparationClockScope(MornBeatPlayModule owner)
+            {
+                _owner = owner;
+                var dsp = AudioSettings.dspTime;
+                owner._offsetTiming.PreparationDspTime = dsp;
+                owner._pureTiming.PreparationDspTime = dsp;
+            }
+
+            public void Dispose()
+            {
+                if (_owner == null)
+                {
+                    return;
+                }
+
+                var owner = _owner;
+                _owner = null;
+                if (!ReferenceEquals(owner._preparationClock, this))
+                {
+                    return;
+                }
+
+                owner._offsetTiming.PreparationDspTime = null;
+                owner._pureTiming.PreparationDspTime = null;
+                owner._preparationClock = null;
+            }
         }
     }
 }
